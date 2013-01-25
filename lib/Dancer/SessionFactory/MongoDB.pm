@@ -17,7 +17,7 @@ use Dancer::Core::Types;
 
 =attr database_name (required)
 
-Database name containing the sessions collection
+Name of the database to hold the sessions collection.
 
 =cut
 
@@ -29,7 +29,7 @@ has database_name => (
 
 =attr collection_name
 
-Defaults to 'dancer_sessions'.
+Collection name for storing session data. Defaults to 'dancer_sessions'.
 
 =cut
 
@@ -41,7 +41,9 @@ has collection_name => (
 
 =attr client_options
 
-Hash reference to pass through to L<MongoDB::MongoClient> constructor.
+Hash reference of configuration options to pass through to
+L<MongoDB::MongoClient> constructor.  See that module for details on
+configuring authentication, replication, etc.
 
 =cut
 
@@ -126,7 +128,8 @@ sub _sessions {
 
 =head1 DESCRIPTION
 
-Blah blah blah
+This module implementes a session factory for Dancer 2 that stores session
+state within L<MongoDB>.
 
 =cut
 
