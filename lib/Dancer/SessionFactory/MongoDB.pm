@@ -82,15 +82,19 @@ sub _build__collection {
 
 with 'Dancer::Core::Role::SessionFactory';
 
+# When saving/retrieving, we need to add/strip the _id parameter
+# because the Dancer::Core::Session object keeps them as separate
+# attributes
+
 sub _retrieve {
     my ( $self, $id ) = @_;
-    my $data = $self->_collection->find_one( { _id => $id } );
+    my $doc = $self->_collection->find_one( { _id => $id } );
+    return $doc->{data};
 }
 
 sub _flush {
     my ( $self, $id, $data ) = @_;
-    my %doc = ( %$data, _id => $id );
-    $self->_collection->save( \%doc, { safe => 1 } );
+    $self->_collection->save( { _id => $id, data => $data }, { safe => 1 } );
 }
 
 sub _destroy {

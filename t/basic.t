@@ -127,13 +127,26 @@ Test::TCP::test_tcp(
 
         # create separate session
         $ua->cookie_jar( { file => "$tempdir/cookies2.txt" } );
-        $res = $ua->get("http://127.0.0.1:$port/set_session/curly");
+        $res = $ua->get("http://127.0.0.1:$port/set_session/moe");
         ok $res->is_success, "/set_session/larry";
 
         # count sessions
         $res = $ua->get("http://127.0.0.1:$port/list_sessions");
         my $list = from_json( $res->content );
-        is ( scalar @$list, 2, "got correct number of sessions" );
+        is( scalar @$list, 2, "got correct number of sessions" );
+
+        $res = $ua->get("http://127.0.0.1:$port/dump_session");
+        my $dump = from_json( $res->content );
+        $cookie = extract_cookie($res);
+        my $sid4 = $cookie->{"dancer.session"};
+        is_deeply(
+            $dump,
+            {
+                id   => $sid4,
+                data => { name => 'moe' },
+            },
+            "session dump correct"
+        );
 
         File::Temp::cleanup();
     },
@@ -170,6 +183,10 @@ Test::TCP::test_tcp(
 
         get '/list_sessions' => sub {
             return to_json( engine("session")->sessions );
+        };
+
+        get '/dump_session' => sub {
+            return to_json( { %{ session() } } );
         };
 
         setting appdir => $tempdir;
