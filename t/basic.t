@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Test::TCP 1.13;
 
+use JSON;
 use File::Temp 0.22;
 use HTTP::Date qw/str2time/;
 use LWP::UserAgent;
@@ -36,13 +37,12 @@ my $tempdir = File::Temp::tempdir( CLEANUP => 1, TMPDIR => 1 );
 
 my $engine = "MongoDB";
 
-diag "Testing engine $engine";
 Test::TCP::test_tcp(
     client => sub {
         my $port = shift;
 
         my $ua = LWP::UserAgent->new;
-        $ua->cookie_jar( { file => "$tempdir/.cookies.txt" } );
+        $ua->cookie_jar( { file => "$tempdir/cookies.txt" } );
 
         # no session cookie set if session not referenced
         my $res = $ua->get("http://127.0.0.1:$port/no_session_data");
@@ -125,6 +125,16 @@ Test::TCP::test_tcp(
           or diag explain $cookie;
         like $res->content, qr/name='damian'/, "session value looks good";
 
+        # create separate session
+        $ua->cookie_jar( { file => "$tempdir/cookies2.txt" } );
+        $res = $ua->get("http://127.0.0.1:$port/set_session/curly");
+        ok $res->is_success, "/set_session/larry";
+
+        # count sessions
+        $res = $ua->get("http://127.0.0.1:$port/list_sessions");
+        my $list = from_json( $res->content );
+        is ( scalar @$list, 2, "got correct number of sessions" );
+
         File::Temp::cleanup();
     },
     server => sub {
@@ -156,6 +166,10 @@ Test::TCP::test_tcp(
             context->destroy_session;
             session name => 'damian';
             return "churned";
+        };
+
+        get '/list_sessions' => sub {
+            return to_json( engine("session")->sessions );
         };
 
         setting appdir => $tempdir;
