@@ -128,7 +128,7 @@ sub _sessions {
 
 =head1 DESCRIPTION
 
-This module implementes a session factory for Dancer 2 that stores session
+This module implements a session factory for Dancer 2 that stores session
 state within L<MongoDB>.
 
 =cut
