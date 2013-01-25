@@ -3,11 +3,106 @@ use strict;
 use warnings;
 
 package Dancer::SessionFactory::MongoDB;
-# ABSTRACT: No abstract given for Dancer::SessionFactory::MongoDB
+# ABSTRACT: Dancer 2 session storage with MongoDB
 # VERSION
 
-# Dependencies
-use autodie 2.00;
+use Moo;
+use MongoDB::MongoClient;
+use MongoDB::OID;
+use Dancer::Core::Types;
+
+#--------------------------------------------------------------------------#
+# Public attributes
+#--------------------------------------------------------------------------#
+
+=attr database_name (required)
+
+Database name containing the sessions collection
+
+=cut
+
+has database_name => (
+    is       => 'ro',
+    isa      => Str,
+    required => 1,
+);
+
+=attr collection_name
+
+Defaults to 'dancer_sessions'.
+
+=cut
+
+has collection_name => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub { "dancer_sessions" },
+);
+
+=attr client_options
+
+Hash reference to pass through to L<MongoDB::MongoClient> constructor.
+
+=cut
+
+has client_options => (
+    is      => 'ro',
+    isa     => HashRef,
+    default => sub { {} },
+);
+
+#--------------------------------------------------------------------------#
+# Private attributes
+#--------------------------------------------------------------------------#
+
+has _client => (
+    is  => 'lazy',
+    isa => InstanceOf ['MongoDB::MongoClient'],
+);
+
+sub _build__client {
+    my ($self) = @_;
+    return MongoDB::MongoClient->new( $self->client_options );
+}
+
+has _collection => (
+    is  => 'lazy',
+    isa => InstanceOf ['MongoDB::Collection'],
+);
+
+sub _build__collection {
+    my ($self) = @_;
+    my $db = $self->_client->get_database( $self->database_name );
+    return $db->get_collection( $self->collection_name );
+}
+
+#--------------------------------------------------------------------------#
+# Role composition
+#--------------------------------------------------------------------------#
+
+with 'Dancer::Core::Role::SessionFactory';
+
+sub _retrieve {
+    my ( $self, $id ) = @_;
+    my $data = $self->_collection->find_one( { _id => $id } );
+}
+
+sub _flush {
+    my ( $self, $id, $data ) = @_;
+    my %doc = ( %$data, _id => $id );
+    $self->_collection->save( \%doc, { safe => 1 } );
+}
+
+sub _destroy {
+    my ( $self, $id ) = @_;
+    $self->_collection->remove( { _id => $id }, { safe => 1 } );
+}
+
+sub _sessions {
+    my ($self) = @_;
+    my $cursor = $self->_collection->query->fields( { _id => 1 } );
+    return [ map { $_->{_id} } $cursor->all ];
+}
 
 1;
 
@@ -15,21 +110,20 @@ use autodie 2.00;
 
 =head1 SYNOPSIS
 
-  use Dancer::SessionFactory::MongoDB;
+  # In Dancer 2 config.yml file
+
+  session: MongoDB
+  engines:
+    session:
+      MongoDB:
+        database_name: myapp_db
+        client_options:
+          host: mongodb://localhost:27017
 
 =head1 DESCRIPTION
 
-This module might be cool, but you'd never know it from the lack
-of documentation.
-
-=head1 USAGE
-
-Good luck!
-
-=head1 SEE ALSO
-
-Maybe other modules do related things.
+Blah blah blah
 
 =cut
 
-# vim: ts=2 sts=2 sw=2 et:
+# vim: ts=4 sts=4 sw=4 et:
