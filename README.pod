@@ -22,7 +22,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This module implementes a session factory for Dancer 2 that stores session
+This module implements a session factory for Dancer 2 that stores session
 state within L<MongoDB>.
 
 =head1 ATTRIBUTES
