@@ -2,14 +2,14 @@ use 5.008001;
 use strict;
 use warnings;
 
-package Dancer::SessionFactory::MongoDB;
+package Dancer2::Session::MongoDB;
 # ABSTRACT: Dancer 2 session storage with MongoDB
 # VERSION
 
 use Moo;
 use MongoDB::MongoClient;
 use MongoDB::OID;
-use Dancer::Core::Types;
+use Dancer2::Core::Types;
 
 #--------------------------------------------------------------------------#
 # Public attributes
@@ -82,10 +82,10 @@ sub _build__collection {
 # Role composition
 #--------------------------------------------------------------------------#
 
-with 'Dancer::Core::Role::SessionFactory';
+with 'Dancer2::Core::Role::SessionFactory';
 
 # When saving/retrieving, we need to add/strip the _id parameter
-# because the Dancer::Core::Session object keeps them as separate
+# because the Dancer2::Core::Session object keeps them as separate
 # attributes
 
 sub _retrieve {

@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Dancer-SessionFactory-MongoDB",
+   "name" : "Dancer2-Session-MongoDB",
    "no_index" : {
       "directory" : [
          "t",
@@ -40,9 +40,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer" : "1.999999",
-            "Dancer::Core::Role::SessionFactory" : "0",
-            "Dancer::Core::Types" : "0",
+            "Dancer2" : "2",
+            "Dancer2::Core::Role::SessionFactory" : "0",
+            "Dancer2::Core::Types" : "0",
             "MongoDB::MongoClient" : "0",
             "MongoDB::OID" : "0",
             "Moo" : "0",
@@ -53,12 +53,15 @@
       },
       "test" : {
          "requires" : {
-            "Dancer" : "0",
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0.22",
             "HTTP::Date" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "MongoDB" : "0",
             "Test::More" : "0",
             "Test::TCP" : "1.13"
@@ -66,23 +69,23 @@
       }
    },
    "provides" : {
-      "Dancer::SessionFactory::MongoDB" : {
-         "file" : "lib/Dancer/SessionFactory/MongoDB.pm",
-         "version" : "0.001"
+      "Dancer2::Session::MongoDB" : {
+         "file" : "lib/Dancer2/Session/MongoDB.pm",
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/dagolden/dancer-sessionfactory-mongodb/issues"
+         "web" : "https://github.com/dagolden/dancer2-session-mongodb/issues"
       },
-      "homepage" : "https://metacpan.org/release/Dancer-SessionFactory-MongoDB",
+      "homepage" : "https://metacpan.org/release/Dancer2-Session-MongoDB",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/dagolden/dancer-sessionfactory-mongodb.git",
-         "web" : "https://github.com/dagolden/dancer-sessionfactory-mongodb"
+         "url" : "git://github.com/dagolden/dancer2-session-mongodb.git",
+         "web" : "https://github.com/dagolden/dancer2-session-mongodb"
       }
    },
-   "version" : "0.001"
+   "version" : "0.002"
 }
 
