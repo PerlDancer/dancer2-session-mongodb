@@ -208,7 +208,9 @@ Test::TCP::test_tcp(
             port         => $port
         );
 
-        Dancer2->runner->server->port($port);
+        Dancer2->runner->setting(
+            port => $port,
+        );
         start;
     },
 );
