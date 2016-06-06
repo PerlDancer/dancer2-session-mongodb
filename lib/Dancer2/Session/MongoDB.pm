@@ -4,7 +4,7 @@ use warnings;
 
 package Dancer2::Session::MongoDB;
 # ABSTRACT: Dancer 2 session storage with MongoDB
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Moo;
 use MongoDB::MongoClient;

@@ -2,6 +2,10 @@ Revision history for Dancer2-Session-MongoDB
 
 {{$NEXT}}
 
+    - Numerous Dist::Zilla fixes (Peter Mottram)
+    - Switch to Plack::Test instead of Test::TCP and 
+      LWP::UserAgent (Peter Mottram)
+
 0.002     2013-02-23 22:27:55 America/New_York
 
     - Renamed from Dancer-SessionFactory-MongoDB to
