@@ -2,7 +2,7 @@ Revision history for Dancer2-Session-MongoDB
 
 {{$NEXT}}
 
-    - Numerous Dist::Zilla fixes (Peter Mottram)
+    - Numerous Dist::Zilla fixes (Peter Mottram, David Golden)
     - Switch to Plack::Test instead of Test::TCP and 
       LWP::UserAgent (Peter Mottram)
 
