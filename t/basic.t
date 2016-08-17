@@ -33,6 +33,16 @@ my $tempdir = File::Temp::tempdir( CLEANUP => 1, TMPDIR => 1 );
         "name='$name'";
     };
 
+    get '/change_session_id' => sub {
+        if ( app->can('change_session_id') ) {
+            app->change_session_id;
+            return "supported";
+        }
+        else {
+            return "unsupported";
+        }
+    };
+
     get '/destroy_session' => sub {
         my $name = session('name') || '';
         app->destroy_session;
@@ -137,6 +147,30 @@ ok $jar->as_string, "cookie has been set";
 like $jar->as_string, qr/Set-Cookie.*: dancer.session/i, "cookie looks good"
   or diag explain $jar->as_string;
 
+# change_session_id
+
+$req = GET "$url/change_session_id";
+$jar->add_cookie_header($req);
+$res = $test->request($req);
+ok $res->is_success, "/change_session_id is success";
+$jar->extract_cookies($res);
+
+$jar->as_string =~ /dancer\.session=(.+?);/;
+my $sid2 = $1;
+
+SKIP: {
+    skip "change_session_id not supported by this version of Dancer2", 1
+      if $res->content eq "unsupported";
+    isnt $sid1, $sid2, "Session ID has been changed";
+};
+
+$req = GET "$url/read_session";
+$jar->add_cookie_header($req);
+$res = $test->request($req);
+ok $res->is_success, "/read_session is success";
+$jar->extract_cookies($res);
+like $res->content, qr/name='larry'/, "session value looks good";
+
 # destroy session and check that cookies are gone
 $req = GET "$url/destroy_session";
 $jar->add_cookie_header($req);
@@ -166,9 +200,9 @@ like $jar->as_string, qr/Set-Cookie.*: dancer.session/i, "cookie looks good"
   or diag explain $jar->as_string;
 
 $jar->as_string =~ /dancer\.session=(.+?);/;
-my $sid2 = $1;
+my $sid3 = $1;
 
-isnt $sid2, $sid1, "New session has different ID";
+isnt $sid3, $sid2, "New session has different ID";
 
 # destroy and create a session in one request
 $req = GET "$url/churn_session";
@@ -179,9 +213,9 @@ $jar->extract_cookies($res);
 ok $jar->as_string, "cookie has been set";
 
 $jar->as_string =~ /dancer\.session=(.+?);/;
-my $sid3 = $1;
+my $sid4 = $1;
 
-isnt $sid3, $sid2, "Changed session has different ID";
+isnt $sid4, $sid3, "Changed session has different ID";
 
 # read value back
 $req = GET "$url/read_session";
@@ -217,12 +251,12 @@ ok $res->is_success, "/dump_session is success";
 my $dump = from_json( $res->content );
 
 $jar->as_string =~ /dancer\.session=(.+?);/;
-my $sid4 = $1;
+my $sid5 = $1;
 
 is_deeply(
     $dump,
     {
-        id       => $sid4,
+        id       => $sid5,
         data     => { name => 'moe' },
         is_dirty => 0,
     },
