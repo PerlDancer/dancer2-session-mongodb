@@ -5,6 +5,7 @@ use Test::More;
 use JSON qw/from_json/;
 use File::Temp 0.22;
 use MongoDB;
+use Safe::Isa;
 use Plack::Test;
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -75,12 +76,14 @@ my $url = "http://localhost";
 my $test = Plack::Test->create( App->to_app );
 my $jar = HTTP::Cookies->new;
 
-my $client = eval { MongoDB::MongoClient->new; };
-plan skip_all => "No MongoDB on localhost" unless $client;
-
-# make sure we clean up from prior runs
-my $db = $client->get_database($db_name);
-$db->drop;
+# Skip tests if MongoDB isn't installed. If it is, 
+# make sure we clean up from prior runs.
+eval { 
+    my $client = MongoDB->connect(); 
+    my $db = $client->get_database($db_name);
+    $db->drop;
+};
+plan skip_all => "No MongoDB on localhost" if $@;
 
 my ( $req, $res );
 
